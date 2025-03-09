@@ -1,26 +1,30 @@
-name: Docker Build and Push
+name: Docker Build & Push
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Set lowercase repository owner
         run: echo "REPO_OWNER=$(echo ${{ github.actor }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
- 
-      - name: Log in to GitHub Container Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
-      - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository_owner }}/docker-flask-app:latest .
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Push Docker image to GitHub Container Registry
-        run: docker push ghcr.io/${{ github.repository_owner }}/docker-flask-app:latest
+      - name: Build Docker Image
+        run: docker build -t ghcr.io/${{ env.REPO_OWNER }}/docker-flask-app:latest .
+
+      - name: Push Docker Image
+        run: docker push ghcr.io/${{ env.REPO_OWNER }}/docker-flask-app:latest
+
