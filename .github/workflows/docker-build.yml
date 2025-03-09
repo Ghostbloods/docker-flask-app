@@ -13,6 +13,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Set lowercase repository owner
+        run: echo "REPO_OWNER=$(echo ${{ github.actor }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+ 
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
